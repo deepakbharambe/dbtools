@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Password Generator</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f7f8;
+    padding: 30px;
+}
+
+.container {
+    max-width: 720px;
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+    text-align: center;
+}
+
+.strength {
+    text-align: center;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+.weak { color: red; }
+.medium { color: orange; }
+.strong { color: green; }
+
+.password-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#length {
+    width: 80px;
+    padding: 10px;
+    font-size: 16px;
+}
+
+#password {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    background: #5fb84b;
+    color: white;
+    border: none;
+    font-weight: bold;
+}
+
+button {
+    padding: 10px 14px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.options label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.special-box {
+    margin-left: 24px;
+    margin-top: 6px;
+}
+
+.special-box input {
+    width: 100%;
+    padding: 6px;
+    font-family: monospace;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>Password Generator</h2>
+
+<div id="strength" class="strength strong">Strong</div>
+
+<div class="password-box">
+    <input type="number" id="length" min="4" max="64" value="20">
+    <input type="text" id="password" readonly>
+    <button onclick="generatePassword()">⟳</button>
+    <button onclick="copyPassword()">Copy</button>
+</div>
+
+<div class="options">
+    <label><input type="checkbox" id="upper" checked> A–Z</label>
+    <label><input type="checkbox" id="lower" checked> a–z</label>
+    <label><input type="checkbox" id="numbers" checked> 0–9</label>
+
+    <label>
+        <input type="checkbox" id="symbols" checked>
+        Special Characters
+    </label>
+    <div class="special-box">
+        <input type="text" id="symbolText"
+               value="!@#$%^&*()-_=+[]{}<>?"
+               title="Editable special characters set">
+    </div>
+
+    <label><input type="checkbox" id="excludeSimilar" checked>
+        Exclude similar characters (O,0,l,1,I)
+    </label>
+
+    <label><input type="checkbox" id="hex">
+        Hexadecimal (0–9, A–F)
+    </label>
+</div>
+
+</div>
+
+<script>
+function generatePassword() {
+    const length = parseInt(document.getElementById("length").value);
+
+    const useUpper = upper.checked;
+    const useLower = lower.checked;
+    const useNumbers = numbers.checked;
+    const useSymbols = symbols.checked;
+    const excludeSimilar = excludeSimilarChk.checked;
+    const hexOnly = hex.checked;
+
+    let upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let lowerChars = "abcdefghijklmnopqrstuvwxyz";
+    let numberChars = "0123456789";
+    let symbolChars = document.getElementById("symbolText").value;
+
+    if (excludeSimilar) {
+        upperChars = upperChars.replace(/[OIL]/g, "");
+        lowerChars = lowerChars.replace(/[oil]/g, "");
+        numberChars = numberChars.replace(/[01]/g, "");
+        symbolChars = symbolChars.replace(/[|`]/g, "");
+    }
+
+    let charset = "";
+
+    if (hexOnly) {
+        charset = "0123456789ABCDEF";
+    } else {
+        if (useUpper) charset += upperChars;
+        if (useLower) charset += lowerChars;
+        if (useNumbers) charset += numberChars;
+        if (useSymbols && symbolChars.length > 0)
+            charset += symbolChars;
+    }
+
+    if (!charset.length) {
+        alert("No characters selected.");
+        return;
+    }
+
+    let pw = "";
+    for (let i = 0; i < length; i++) {
+        pw += charset[Math.floor(Math.random() * charset.length)];
+    }
+
+    password.value = pw;
+    updateStrength(pw);
+}
+
+function updateStrength(pw) {
+    let score = 0;
+    if (pw.length >= 12) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[a-z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+    let text = "Weak";
+    let cls = "weak";
+
+    if (score >= 4) { text = "Strong"; cls = "strong"; }
+    else if (score >= 2) { text = "Medium"; cls = "medium"; }
+
+    strength.textContent = text;
+    strength.className = "strength " + cls;
+}
+
+function copyPassword() {
+    password.select();
+    document.execCommand("copy");
+    alert("Password copied to clipboard");
+}
+
+/* shortcut references */
+const upper = document.getElementById("upper");
+const lower = document.getElementById("lower");
+const numbers = document.getElementById("numbers");
+const symbols = document.getElementById("symbols");
+const excludeSimilarChk = document.getElementById("excludeSimilar");
+const hex = document.getElementById("hex");
+const password = document.getElementById("password");
+const strength = document.getElementById("strength");
+
+generatePassword();
+</script>
+
+</body>
+</html>
