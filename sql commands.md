@@ -1,7 +1,9 @@
+<details>
 <summary>My top languages</summary>
 ```SQL
 select * from dual;
 ```
+</details>
 
 
 > Context and memory play powerful roles in all the truly great meals in one's life.
