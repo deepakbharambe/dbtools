@@ -191,6 +191,7 @@ on allfiles.file_id=free_size_mb.file_id
 WHERE  allfiles.tablespace_name = '&1'
 ORDER  BY file_id;  
 ```
+</details>
 
 
 > Context and memory play powerful roles in all the truly great meals in one's life.
