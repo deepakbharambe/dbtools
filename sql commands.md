@@ -196,7 +196,7 @@ ORDER  BY file_id;
 > Context and memory play powerful roles in all the truly great meals in one's life.
 
 
-<details open>
+<details>
 <summary>My top languages</summary>
 
 | Rank | Languages |
