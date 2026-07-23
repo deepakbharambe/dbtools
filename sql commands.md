@@ -1,2 +1,3 @@
-```select * from dual;
+```SQL
+select * from dual;
 ```
