@@ -149,6 +149,50 @@ ORDER BY
 </details>
 
 
+<details>
+<summary>oem_tablespace_report1</summary>
+  
+```SQL
+col file_name for a100
+col TABLESPACE_NAME for a20
+set lines 230 pages 70
+WITH allfiles
+     AS (SELECT d.file_id,
+                d.file_name,
+                d.bytes / 1024 / 1024 bytes_MB ,
+                d.maxbytes / 1024 / 1024 maxbytes_MB,
+                d.autoextensible,
+                ( d.increment_by * t.block_size ) / 1024 / 1024 INCREMENT_BY_MB,
+                d.tablespace_name,
+                df.creation_time
+         FROM   dba_data_files d,
+                dba_tablespaces t,
+                v$datafile df
+         WHERE  d.tablespace_name = t.tablespace_name
+                AND df.file# = d.file_id
+         UNION ALL
+         SELECT d.file_id,
+                d.file_name,
+                d.bytes / 1024 / 1024 bytes_MB,
+                d.maxbytes / 1024 / 1024 maxbytes_MB,
+                d.autoextensible,
+                ( d.increment_by * t.block_size ) / 1024 / 1024 INCREMENT_BY_MB,
+                d.tablespace_name,
+                tf.creation_time
+         FROM   dba_temp_files d,
+                dba_tablespaces t,
+                v$tempfile tf
+         WHERE  d.tablespace_name = t.tablespace_name
+                AND tf.file# = d.file_id),
+free_size_mb as (select file_id,sum(bytes/1024/1024) free_MB from dba_free_space group by file_id)
+SELECT allfiles.FILE_ID, allfiles.FILE_NAME, allfiles.bytes_MB, allfiles.maxbytes_MB, allfiles.autoextensible, allfiles.INCREMENT_BY_MB, allfiles.TABLESPACE_NAME, allfiles.creation_time, free_size_mb.free_MB
+FROM   allfiles left join free_size_mb
+on allfiles.file_id=free_size_mb.file_id
+WHERE  allfiles.tablespace_name = '&1'
+ORDER  BY file_id;  
+```
+
+
 > Context and memory play powerful roles in all the truly great meals in one's life.
 
 
