@@ -150,7 +150,7 @@ ORDER BY
 
 
 <details>
-<summary>oem_tablespace_report1</summary>
+<summary>List files of tablespace</summary>
   
 ```SQL
 col file_name for a100
